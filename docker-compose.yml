@@ -1,0 +1,88 @@
+version: '3.9'
+
+services:
+
+  mysql-master:
+    image: mysql:5.7
+    container_name: proxysql-mysql-replication-master
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: sbtest
+    volumes:
+      - ./master/my.cnf:/etc/mysql/my.cnf
+      - ./master/data:/var/lib/mysql
+      - ./master/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - 3306:3306
+    networks:
+      - mysql_cluster_net 
+
+  mysql-slave1:
+    image: mysql:5.7
+    container_name: proxysql-mysql-replication-slave1
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: sbtest
+    volumes:
+      - ./slave/my-slave1.cnf:/etc/mysql/my.cnf
+      - ./slave/data/slave1:/var/lib/mysql
+      - ./slave/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - 3307:3306
+    depends_on:
+      - mysql-master
+    networks:
+      - mysql_cluster_net
+
+  mysql-slave2:
+    image: mysql:5.7
+    container_name: proxysql-mysql-replication-slave2
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: sbtest
+    volumes:
+      - ./slave/my-slave2.cnf:/etc/mysql/my.cnf
+      - ./slave/data/slave2:/var/lib/mysql
+      - ./slave/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - 3308:3306
+    depends_on:
+      - mysql-master
+    networks:
+      - mysql_cluster_net
+
+  proxysql:
+    image: proxysql/proxysql:2.0.12
+    container_name: proxysql-mysql-replication-proxysql
+    ports:
+      - 6032:6032
+      - 6033:6033
+    volumes:
+      - ./proxysql/proxysql.cnf:/etc/proxysql.cnf
+      - ./proxysql/data:/var/lib/proxysql
+    networks:
+      - mysql_cluster_net
+    depends_on:
+      - mysql-master
+      - mysql-slave1
+      - mysql-slave2
+  
+  # proxysql-test-app:
+  #   build:
+  #     context: .
+  #   image: dipanjalmaitra/proxysql-test-app:latest
+  #   ports:
+  #     - 8080:8080
+  #   restart: on-failure
+  #   # networks:
+  #   #   - mysql_cluster_net
+  #   # depends_on:
+  #   #   - proxysql
+  #   environment:
+  #     DB_PASSWORD: password
+  #     DB_URL: jdbc:mysql://proxysql:6033/sbtest?useSSL=false
+  #     ACTIVE_PROFILE: default
+
+networks:
+  mysql_cluster_net:
+    driver: bridge

@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:mysql://172.104.175.169:6033/sbtest?useSSL=false}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:password}
+  flyway:
+    enabled: false
+
+application-test:
+    testFetchAllUsers:
+      repeat: 10 #set test repeat time
+      delay: 5000 #set delays in milli

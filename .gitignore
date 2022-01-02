@@ -1,0 +1,6 @@
+master/data
+slave/data
+proxysql/data
+
+### VS Code ###
+.vscode/
