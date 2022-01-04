@@ -1,6 +1,6 @@
 # ProxySQL, MySQL Clustering, Spring Boot
 
-![Blank Diagram](https://user-images.githubusercontent.com/13511520/83347412-e2c4f280-a35f-11ea-8048-2b0645e99245.png)
+![Blank Diagram](./demographic.png)
 
 ## Configuration
 
