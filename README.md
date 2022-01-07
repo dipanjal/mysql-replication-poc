@@ -496,6 +496,8 @@ As you can see the **Write** query has executed in **Master** and the **Bin Log*
 	- https://docs.oracle.com/en/database/oracle/oracle-database/19/vldbg/partition-concepts.html#GUID-EA7EF5CB-DD49-43AF-889A-F83AAC0D7D51
 - MySQL Bin Log
 	- https://dev.mysql.com/doc/internals/en/binary-log-overview.html
+- MySQL Replication Stratagy
+	- https://severalnines.com/resources/database-management-tutorials/mysql-replication-high-availability-tutorial
 - ProxySQL Configuration
 	- https://proxysql.com/documentation/global-variables/mysql-variables/
 	- Replication Lag
