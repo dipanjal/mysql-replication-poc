@@ -514,4 +514,4 @@ As you can see the **Write** query has executed in **Master** and the **Bin Log*
 		- https://proxysql.com/documentation/backend-monitoring/
 		- https://proxysql.com/documentation/backend-server-configuration/
 	- ProxySQL Rules
-		- shorturl.at/pxST9 
+		- https://proxysql.com/documentation/proxysql-configuration/
