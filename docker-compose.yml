@@ -1,4 +1,4 @@
-version: '3.9'
+version: '3'
 
 services:
 
@@ -23,7 +23,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: sbtest
-    volumes:
+    volumes: #
       - ./slave/my-slave1.cnf:/etc/mysql/my.cnf
       - ./slave/data/slave1:/var/lib/mysql
       - ./slave/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -62,11 +62,12 @@ services:
       - ./proxysql/data:/var/lib/proxysql
     networks:
       - mysql_cluster_net
-    depends_on:
+    depends_on: # the proxy will start after all the mysql instance has started
       - mysql-master
       - mysql-slave1
       - mysql-slave2
   
+  ## if you want to dockrize your Spring Boot Application
   # proxysql-test-app:
   #   build:
   #     context: .
@@ -83,6 +84,7 @@ services:
   #     DB_URL: jdbc:mysql://proxysql:6033/sbtest?useSSL=false
   #     ACTIVE_PROFILE: default
 
+#creating a common L2 Bridge network for the Docker containers internal communication
 networks:
   mysql_cluster_net:
     driver: bridge
