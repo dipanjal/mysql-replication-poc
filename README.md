@@ -36,9 +36,11 @@ Let's Assume you can executed a Query
 INSERT INTO products (product_name, product_status, price, created_at)
 VALUES('TP-Link Archar C60', 'AVAILABLE', 3500, sysdate(3))
 ```
-Firstly, The Query will be executed at Master when the value of sysdate(3) = 2022-01-07 12:04:59.114
-Secondly, The Query will be executed at Slave 1 when the value of sysdate(3) = 2022-01-07 12:05:00.100
-Thirdly, The Query will be executed at Slave 2 when the value of sysdate(3) = 2022-01-07 12:05:00.405
+- Firstly, The Query will be executed at Master when the value of sysdate(3) = 2022-01-07 12:04:59.114
+
+- Secondly, The Query will be executed at Slave 1 when the value of sysdate(3) = 2022-01-07 12:05:00.100
+
+- Thirdly, The Query will be executed at Slave 2 when the value of sysdate(3) = 2022-01-07 12:05:00.405
 
 Yeah, this will clearly create inconsitancy problem. So we need to drop this idea.
 
