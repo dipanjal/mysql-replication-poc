@@ -20,7 +20,7 @@ But what's the problem here ?
 Your *product* tables is growing larger in course of time and when you are executing the query above, it's doing a `Full Table Scan` which basically a Linear Search operation ( Time Complexity `O(n)` ). So you can say, ok fine I'm gonna add an **Index** to `price` column and my beautiful databse will arrange it in a `Balanced Binary Tree` or a `B-Tree` where the Tree *Balances* itself when a new record *Inserted*, *Deleted* or *Updated* the existing column value each time, to make the *Read* operations faster in `O(log n)` Time Complexity where **“n” is the total number of elements in the B-Tree**. But the balancing tree has a cost, besides renge query (`SELECT job FROM products WHERE price BETWEEN 5000 AND 10000`) is not effecient in `B-Tree`, hence `B+ Tree` comes into the picture. But still, what if you have 1 millions records in the `products` table and you just have inserted a new record and bam!! Your DB is doing so much work to `re-balance` the large Tree.
 
 So, What can you do now ? Ok, You can do table **Partitioning** based on `id` let's say, because the `id` use-case fits best here. **Partitioning is a technique to subdivide objects into smaller pieces.** It actually breaks the huge table into many different partiotion tables by range depending on the partiotion key and these partition tables are again mapped by the `<KEY, VALUE>` pair where the *partition_key* as the KEY and *partition_table_reference* as the VALUE of the map.
-For example: your page size = 20000 so the ids from 1 to 20000 falls into *partition_1* and ids from 20000 - 40000 goes into *partition_2* and so on and so forth. But don't worry guys, these partitions are *managed implicitly* by the Database itself. It knows, to get result for the for the Specific *Read* query (`SELECT * FROM products WHERE id = 18`) in which partition it needs to look for. So it can be a solution to reduce the Tree Balancing Cost, because as you can feel the Search space is much smaller than before so the `Balanced B+ Tree` cost has optimized. Great, peorblem solved. But as your business grew, your user-base also grown. Now you have a thousands of concurrent users who are reading millions of from your (Read Heavy) Database and the Single Database server is dealing with a huge number of concurrent TCP connections. Your single Database instance is junked up with these enourmous number of concurrent requestes and it might be ran out of it's `QPS (Query Per Second)` limit too. Here's **Replication** comes into the solution space. 
+For example: your page size = 20000 so the ids from 1 to 20000 falls into *partition_1* and ids from 20000 - 40000 goes into *partition_2* and so on and so forth. But don't worry guys, these partitions are *managed implicitly* by the Database itself. It knows, to get result for the for the Specific *Read* query (`SELECT * FROM products WHERE id = 18`) in which partition it needs to look for. So it can be a solution to reduce the Tree Balancing Cost, because as you can feel the Search space is much smaller than before so the `Balanced B+ Tree` cost has optimized. Great, peorblem solved. But as your business grew, your user-base also grown. Now you have a thousands of concurrent users who are reading millions of records from your (Read Heavy) Database and the Single Database server is dealing with a huge number of concurrent TCP connections. Your single Database instance is junked up with these enourmous number of concurrent requestes and it might be ran out of it's `QPS (Query Per Second)` limit too. Here's **Replication** comes into the solution space. 
 
 ## What is DB Replication?
 DB Replication is a kind of Horizontal Scaling making the same copy of the Full Database and Distribute them in **Master/Slave** architecture where the **Master** deals with all the **Write** operations and *Periodically Updates* it's **Slave** Replicas, who will Handle only the **Read** queries. So your Database load is Distributed now. But remember, the *Slaves* must be **Consistent** with the *Master* so there must be a Replication Strategy.
@@ -29,6 +29,7 @@ DB Replication is a kind of Horizontal Scaling making the same copy of the Full 
 After any Write Query (Insert. Update, Delete) executed in the Master, the DB somehow Replicate the changes to the Slaves. The Master  triggers a change event and the Slaves pull the Changes from the Event and Update themselves. Let's generate some ideas on this.
 
 Idea 1: Can we Stream the SQL Statements?
+
 So Basically, We will be Streaming the SQL Query Statements and the Slaves will pull them from the channel and Execute those SQL Statements inside themselves. Well, this can make the Replication **Inconsistent**. Let's see how.
 Assume, you are Creating a new Product
 ```sql
@@ -41,9 +42,10 @@ VALUES('TP-Link Archar C60', 'AVAILABLE', 3500, sysdate(3))
 
 - Thirdly, The Query will be executed at *Slave 2* when the value of *sysdate(3) = 2022-01-07 12:05:00.405*
 
-Epic Fail!! Right? This will clearly create inconsitancy problem. So we need to drop this idea.
+Epic Fail!! Right? This will certainly create inconsitancy problem. So we need to drop this idea.
 
 Idea 2: How about Transfering [Bin Log](https://dev.mysql.com/doc/internals/en/binary-log-overview.html) files?
+
 > The binary log is a set of log files that contain information about data modifications made to a MySQL server instance. Simply it saves the Database States
 
 So, When any Write Query executes in the Master Replica, the change is saved into the Bin Log. After that the Master will transfer these log files towards the Slave Databases **asynchronusly** and the Slaves will pull the change and update their states according to the bin logs.There are also other replication staratagies like Synchronus, Asynchronus and Semi-Asynchronus, but Mysql do Asynchronus replication by default so we are gonna use this for now.
@@ -384,14 +386,14 @@ Enter password: pass2
 +--------------+--------------+------+-----------+--------+--------+-------------+-----------------+---------------------+---------+----------------+---------+
 | hostgroup_id | hostname     | port | gtid_port | status | weight | compression | max_connections | max_replication_lag | use_ssl | max_latency_ms | comment |
 +--------------+--------------+------+-----------+--------+--------+-------------+-----------------+---------------------+---------+----------------+---------+
-| 20           | mysql-master | 3306 | 0         | ONLINE | 1      | 0           | 100             | 5                   | 0       | 0              |         |
+| 10           | mysql-master | 3306 | 0         | ONLINE | 1      | 0           | 100             | 5                   | 0       | 0              |         |
 | 20           | mysql-slave2 | 3306 | 0         | ONLINE | 1      | 0           | 100             | 5                   | 0       | 0              |         |
 | 20           | mysql-slave1 | 3306 | 0         | ONLINE | 1      | 0           | 100             | 5                   | 0       | 0              |         |
 +--------------+--------------+------+-----------+--------+--------+-------------+-----------------+---------------------+---------+----------------+---------+
 ```
 Looks Good, All the Master and Slaves are Online and Synced up.
 
-Now Open a new Terminal and Try to run some query and Monitor the General Logs of Master and @ Slaves
+Now Open a new Terminal and Try to run some query and Monitor the General Logs of Master and Slaves
 
 ## Showtime
 All our tedious configuration is done, now lets open 3 terminals 1 for master and other 2 for slaves and place them side by side so that you can monitor all of them together. Try to run some Read/Write query from your Spring Boot application or any Database Client like Mysql Workbench and Monitor the General Logs of Master and Slaves
