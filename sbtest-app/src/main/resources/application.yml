@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: ${DB_URL:jdbc:mysql://172.104.175.169:6033/sbtest?useSSL=false}
+    url: ${DB_URL:jdbc:mysql://13.233.178.172:6033/sbtest?useSSL=false}
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:password}
   flyway:
