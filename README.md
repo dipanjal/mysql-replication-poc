@@ -494,6 +494,8 @@ As you can see the **Write** query has executed in **Master** and the **Bin Log*
 	- http://www.differencebetween.info/difference-between-b-tree-and-b-plus-tree 
 - Database Partitioning
 	- https://docs.oracle.com/en/database/oracle/oracle-database/19/vldbg/partition-concepts.html#GUID-EA7EF5CB-DD49-43AF-889A-F83AAC0D7D51
+- Disadvantages of Horizontal Partitioning
+	- https://www.relationaldbdesign.com/database-analysis/module6/disadvantages-ofHorizontal-partitioning.php
 - MySQL Bin Log
 	- https://dev.mysql.com/doc/internals/en/binary-log-overview.html
 - MySQL Replication Stratagy
