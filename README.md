@@ -1,4 +1,4 @@
-# MySQL Replication with ProxySQL
+# MySQL Replication and ProxySQL
 
 In this documentation, we will cover
  
