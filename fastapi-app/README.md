@@ -23,20 +23,17 @@ A basic FastAPI application for MySQL replication POC.
 ### Using Makefile (Recommended)
 
 ```bash
-# Show all available commands
-make help
+# Clean up environment
+make clean
 
 # Install dependencies and setup virtual environment
 make install
 
+# Clean and Build dependencies
+make clean install
+
 # Start the application in development mode
 make run
-
-# Run tests
-make test
-
-# Clean up environment
-make clean
 ```
 
 ## API Documentation
