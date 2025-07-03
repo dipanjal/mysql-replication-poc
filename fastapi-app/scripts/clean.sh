@@ -41,4 +41,4 @@ echo "Removing temporary files..."
 find . -name "*.tmp" -delete
 find . -name "*.temp" -delete
 
-echo "Cleanup completed!" 
+echo "Cleanup completed!"

@@ -85,4 +85,4 @@ def test_delete_user():
     
     # Verify user is deleted
     get_response = client.get(f"/users/{user_id}")
-    assert get_response.status_code == 404 
+    assert get_response.status_code == 404
