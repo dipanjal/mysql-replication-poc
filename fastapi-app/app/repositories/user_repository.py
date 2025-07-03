@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
 from app.models.user import User
 from app.schemas.user import UserCreate, UserUpdate
-from typing import List, Optional
+from typing import List, Optional, Type
+
 
 class UserRepository:
     """Repository for user database operations"""
@@ -21,9 +22,13 @@ class UserRepository:
         """Get user by ID"""
         return self.db.query(User).filter(User.id == user_id).first()
     
-    def get_all(self, skip: int = 0, limit: int = 100) -> List[User]:
+    def get_all(self, skip: int = 0, limit: int = 100) -> List[Type[User]]:
         """Get all users with pagination"""
-        return self.db.query(User).offset(skip).limit(limit).all()
+        return (
+            self.db.query(User)
+            .offset(skip)
+            .limit(limit).all()
+        )
     
     def update(self, user_id: int, user_data: UserUpdate) -> Optional[User]:
         """Update user by ID"""

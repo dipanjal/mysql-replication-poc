@@ -12,27 +12,27 @@ class UserService:
     def create_user(self, user_data: UserCreate) -> UserResponse:
         """Create a new user"""
         user = self.repository.create(user_data)
-        return UserResponse.from_orm(user)
-    
+        return UserResponse.model_validate(user)
+
     def get_user(self, user_id: int) -> Optional[UserResponse]:
         """Get user by ID"""
         user = self.repository.get_by_id(user_id)
         if user:
-            return UserResponse.from_orm(user)
+            return UserResponse.model_validate(user)
         return None
     
     def get_users(self, skip: int = 0, limit: int = 100) -> List[UserResponse]:
         """Get all users with pagination"""
         users = self.repository.get_all(skip, limit)
-        return [UserResponse.from_orm(user) for user in users]
+        return [UserResponse.model_validate(user) for user in users]
     
     def update_user(self, user_id: int, user_data: UserUpdate) -> Optional[UserResponse]:
         """Update user by ID"""
         user = self.repository.update(user_id, user_data)
         if user:
-            return UserResponse.from_orm(user)
+            return UserResponse.model_validate(user)
         return None
     
     def delete_user(self, user_id: int) -> bool:
         """Delete user by ID"""
-        return self.repository.delete(user_id) 
+        return self.repository.delete(user_id)
