@@ -43,7 +43,7 @@ async def health_check(db: Session = Depends(get_db)):
 async def root():
     """Root endpoint"""
     return {
-        "message": "FastAPI CRUD App – minimal schema",
+        "message": "FastAPI CRUD App for ProxySQL – minimal schema",
         "docs": "/docs",
         "health": "/health"
     }
