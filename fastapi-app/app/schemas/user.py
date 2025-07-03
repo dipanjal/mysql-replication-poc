@@ -15,4 +15,4 @@ class UserResponse(BaseModel):
     name: Optional[str] = None
 
     class Config:
-        from_attributes = True  # SQLAlchemy → Pydantic conversion 
+        from_attributes = True  # SQLAlchemy → Pydantic conversion

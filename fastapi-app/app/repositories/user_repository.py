@@ -52,4 +52,4 @@ class UserRepository:
         
         self.db.delete(user)
         self.db.commit()
-        return True 
+        return True

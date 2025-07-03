@@ -47,4 +47,4 @@ async def root():
         "message": "FastAPI CRUD App – minimal schema",
         "docs": "/docs",
         "health": "/health"
-    } 
+    }
