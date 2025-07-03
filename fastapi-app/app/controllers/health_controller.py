@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from app.config.database import get_db
-from datetime import datetime
+from datetime import datetime, UTC
 import logging
 
 logger = logging.getLogger(__name__)
@@ -12,7 +12,7 @@ router = APIRouter(tags=["health"])
 async def health_check(db: Session = Depends(get_db)):
     """Verify API & DB connectivity"""
     status_payload = {
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "app": {"status": "healthy", "message": "FastAPI is running"},
         "database": {}
     }
@@ -22,9 +22,10 @@ async def health_check(db: Session = Depends(get_db)):
         status_payload["database"] = {
             "status": "healthy",
             "message": "Database connection is working",
-            "type": "MySQL"
+            "type": "MySQL",
         }
         status_payload["overall_status"] = "healthy"
+        return status_payload
     except Exception as exc:
         logger.exception("DB health check failed")
         status_payload["database"] = {
@@ -37,8 +38,6 @@ async def health_check(db: Session = Depends(get_db)):
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=status_payload
         )
-    
-    return status_payload
 
 @router.get("/")
 async def root():
