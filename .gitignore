@@ -4,3 +4,6 @@ proxysql/data
 
 ### VS Code ###
 .vscode/
+
+### Mac-OS native
+.DS_Store
