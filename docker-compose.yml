@@ -100,6 +100,24 @@ services:
       DB_PASSWORD: password
       DB_URL: jdbc:mysql://proxysql:6033/sbtest?useSSL=false
       ACTIVE_PROFILE: default
+  
+  proxysql-fastapi-test-app:
+    build:
+      context: ./fastapi-app
+    image: dipanjalmaitra/proxysql-fastapi-test-app:latest
+    ports:
+      - 8000:8000
+    restart: on-failure
+    networks:
+      - mysql_cluster_net
+    depends_on:
+      - proxysql
+    environment:
+      DB_HOST: proxysql
+      DB_PORT: 6033
+      DB_NAME: sbtest
+      DB_USER: root
+      DB_PASSWORD: password
 
 #creating a common L2 Bridge network for the Docker containers internal communication
 networks:
