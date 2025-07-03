@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from app.config.database import get_db
-from datetime import datetime, UTC
+from datetime import datetime, timezone
 import logging
 
 logger = logging.getLogger(__name__)
@@ -12,7 +12,7 @@ router = APIRouter(tags=["health"])
 async def health_check(db: Session = Depends(get_db)):
     """Verify API & DB connectivity"""
     status_payload = {
-        "timestamp": datetime.now(UTC).isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
         "app": {"status": "healthy", "message": "FastAPI is running"},
         "database": {}
     }
