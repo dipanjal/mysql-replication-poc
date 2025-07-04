@@ -31,10 +31,9 @@ class HealthStatus(BaseModel):
     database: str
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(_: FastAPI):
     # Startup
     print("Server listening...")
-    # init_database()
     yield
     # Shutdown
     print("Shutting down...")
