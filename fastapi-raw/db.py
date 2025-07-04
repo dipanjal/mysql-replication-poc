@@ -3,6 +3,7 @@ import logging
 from contextlib import contextmanager
 
 import pymysql
+from fastapi import HTTPException
 
 from helper import Parser
 
@@ -83,10 +84,19 @@ def get_user_by_id_db(user_id):
             cursor = connection.cursor()
             select_query = "SELECT id, name FROM users WHERE id = %s"
             cursor.execute(select_query, (user_id,))
+            row = cursor.fetchone()
+
+            if not row:
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"User associated with id={user_id} doesn't exist"
+                )
+
             return Parser.to_dict(
-                row=cursor.fetchone(),
-                field_sequence=["id", "name"]
+                row, field_sequence=["id", "name"]
             )
+        except HTTPException:
+            raise
         except Exception as e:
             logger.exception(e)
             raise Exception(f"Database error: {str(e)}")
@@ -94,9 +104,7 @@ def get_user_by_id_db(user_id):
 def update_user_db(user_id, name):
     """Update a user in database"""
 
-    existed_user = get_user_by_id_db(user_id)
-    if not existed_user:
-        raise RuntimeError(f"User associated with id={user_id} Not found")
+    get_user_by_id_db(user_id)
 
     with get_db_connection() as connection:
         try:
@@ -114,9 +122,7 @@ def update_user_db(user_id, name):
 def delete_user_db(user_id):
     """Delete a user from database"""
 
-    existed_user = get_user_by_id_db(user_id)
-    if not existed_user:
-        raise RuntimeError(f"User associated with id={user_id} Not found")
+    get_user_by_id_db(user_id)
 
     with get_db_connection() as connection:
         try:
