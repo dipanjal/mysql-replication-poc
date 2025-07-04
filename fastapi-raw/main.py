@@ -2,15 +2,18 @@ from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel
 from typing import List, Optional
 from contextlib import asynccontextmanager
+import logging
 from db import (
-    check_db_connection, 
-    init_database, 
-    create_user_db, 
-    get_all_users_db, 
-    get_user_by_id_db, 
-    update_user_db, 
+    check_db_connection,
+    create_user_db,
+    get_all_users_db,
+    get_user_by_id_db,
+    update_user_db,
     delete_user_db
 )
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Pydantic models
 class UserCreate(BaseModel):
@@ -30,8 +33,8 @@ class HealthStatus(BaseModel):
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
-    print("Starting up...")
-    init_database()
+    print("Server listening...")
+    # init_database()
     yield
     # Shutdown
     print("Shutting down...")

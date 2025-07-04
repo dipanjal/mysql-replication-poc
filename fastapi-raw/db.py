@@ -1,6 +1,10 @@
-import mysql.connector
-from mysql.connector import Error
 import os
+import logging
+from contextlib import contextmanager
+
+import pymysql
+
+logger = logging.getLogger(__name__)
 
 # Database configuration from environment variables
 DB_CONFIG = {
@@ -13,67 +17,47 @@ DB_CONFIG = {
     'autocommit': True
 }
 
+@contextmanager
 def get_db_connection():
     """Get database connection"""
+    connection = None
     try:
-        connection = mysql.connector.connect(**DB_CONFIG)
-        return connection
-    except Error as e:
-        print(f"Error connecting to MySQL: {e}")
+        connection = pymysql.connect(**DB_CONFIG)
+        yield connection
+    except Exception as e:
+        logger.exception(e)
         return None
+    finally:
+        if connection:
+            connection.close()
 
 def check_db_connection():
     """Check if database connection is working"""
-    try:
-        connection = get_db_connection()
-        if connection and connection.is_connected():
-            connection.close()
-            return True
-        return False
-    except:
-        return False
-
-def init_database():
-    """Initialize database and create tables"""
-    try:
-        connection = get_db_connection()
-        if connection:
+    with get_db_connection() as connection:
+        try:
             cursor = connection.cursor()
-            
-            # Create users table
-            create_table_query = """
-            CREATE TABLE IF NOT EXISTS users (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                name VARCHAR(255) NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                INDEX idx_id (id)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-            """
-            cursor.execute(create_table_query)
-            connection.commit()
-            cursor.close()
-            connection.close()
-            print("Database initialized successfully")
-    except Error as e:
-        print(f"Error initializing database: {e}")
+            cursor.execute("SELECT 1")
+            return True
+        except Exception as e:
+            logger.exception(e)
+            return False
 
 def create_user_db(name):
     """Create a new user in database"""
     connection = get_db_connection()
     if not connection:
         raise Exception("Database connection failed")
-    
+
     try:
         cursor = connection.cursor()
         insert_query = "INSERT INTO users (name) VALUES (%s)"
         cursor.execute(insert_query, (name,))
-        
+
         user_id = cursor.lastrowid
         connection.commit()
         cursor.close()
         connection.close()
-        
+
         return user_id
     except Error as e:
         if connection:
@@ -85,16 +69,16 @@ def get_all_users_db():
     connection = get_db_connection()
     if not connection:
         raise Exception("Database connection failed")
-    
+
     try:
         cursor = connection.cursor(dictionary=True)
         select_query = "SELECT id, name FROM users ORDER BY id"
         cursor.execute(select_query)
-        
+
         users = cursor.fetchall()
         cursor.close()
         connection.close()
-        
+
         return users
     except Error as e:
         if connection:
@@ -106,16 +90,16 @@ def get_user_by_id_db(user_id):
     connection = get_db_connection()
     if not connection:
         raise Exception("Database connection failed")
-    
+
     try:
         cursor = connection.cursor(dictionary=True)
         select_query = "SELECT id, name FROM users WHERE id = %s"
         cursor.execute(select_query, (user_id,))
-        
+
         user = cursor.fetchone()
         cursor.close()
         connection.close()
-        
+
         return user
     except Error as e:
         if connection:
@@ -127,10 +111,10 @@ def update_user_db(user_id, name):
     connection = get_db_connection()
     if not connection:
         raise Exception("Database connection failed")
-    
+
     try:
         cursor = connection.cursor()
-        
+
         # Check if user exists
         check_query = "SELECT id FROM users WHERE id = %s"
         cursor.execute(check_query, (user_id,))
@@ -138,14 +122,14 @@ def update_user_db(user_id, name):
             cursor.close()
             connection.close()
             return False
-        
+
         # Update user
         update_query = "UPDATE users SET name = %s WHERE id = %s"
         cursor.execute(update_query, (name, user_id))
         connection.commit()
         cursor.close()
         connection.close()
-        
+
         return True
     except Error as e:
         if connection:
@@ -157,10 +141,10 @@ def delete_user_db(user_id):
     connection = get_db_connection()
     if not connection:
         raise Exception("Database connection failed")
-    
+
     try:
         cursor = connection.cursor()
-        
+
         # Check if user exists
         check_query = "SELECT id FROM users WHERE id = %s"
         cursor.execute(check_query, (user_id,))
@@ -168,14 +152,14 @@ def delete_user_db(user_id):
             cursor.close()
             connection.close()
             return False
-        
+
         # Delete user
         delete_query = "DELETE FROM users WHERE id = %s"
         cursor.execute(delete_query, (user_id,))
         connection.commit()
         cursor.close()
         connection.close()
-        
+
         return True
     except Error as e:
         if connection:
