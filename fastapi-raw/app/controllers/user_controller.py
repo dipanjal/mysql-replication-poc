@@ -11,10 +11,7 @@ router = APIRouter(prefix="/users", tags=["users"])
 @router.post("/", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 async def create_user(user: UserCreate):
     """Create a new user"""
-    try:
-        return UserService().create_user(user)
-    except Exception as e:
-        raise DatabaseError(f"Failed to create user: {str(e)}")
+    return UserService().create_user(user)
 
 @router.get("/", response_model=List[UserResponse])
 async def get_users():
