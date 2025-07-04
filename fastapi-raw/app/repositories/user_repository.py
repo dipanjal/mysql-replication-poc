@@ -1,8 +1,8 @@
 import logging
-from typing import List, Optional, Dict, Any
+from typing import Optional
+
 from app.config.database import get_db_connection
 from app.schemas.user import UserCreate, UserUpdate
-from app.helper import Parser
 
 logger = logging.getLogger(__name__)
 
@@ -23,45 +23,38 @@ class UserRepository:
                 logger.exception(e)
                 raise RuntimeError(f"Database error: {str(e)}")
 
-    def get_by_id(self, user_id: int) -> Optional[Dict[str, Any]]:
+    def get_by_id(self, user_id: int) -> Optional[tuple[any]]:
         """Get user by ID"""
         with get_db_connection() as connection:
             try:
                 cursor = connection.cursor()
                 select_query = "SELECT id, name FROM users WHERE id = %s"
                 cursor.execute(select_query, (user_id,))
-                row = cursor.fetchone()
-
-                if not row:
-                    return None
-
-                return Parser.to_dict(row, field_sequence=["id", "name"])
+                user_record = cursor.fetchone()
+                return user_record
             except Exception as e:
                 logger.exception(e)
                 raise Exception(f"Database error: {str(e)}")
 
-    def get_all(self) -> List[Dict[str, Any]]:
+    def get_all(self) -> tuple[tuple[any]]:
         """Get all users"""
         with get_db_connection() as connection:
             try:
                 cursor = connection.cursor()
                 select_query = "SELECT id, name FROM users ORDER BY id"
                 cursor.execute(select_query)
-                users = Parser.to_dicts(
-                    rows=cursor.fetchall(),
-                    field_sequence=["id", "name"]
-                )
-                return users
+                user_rows = cursor.fetchall()
+                return user_rows
             except Exception as e:
                 logger.exception(e)
                 raise Exception(f"Database error: {str(e)}")
 
-    def update(self, user_id: int, user_data: UserUpdate) -> Optional[Dict[str, Any]]:
+    def update(self, user_id: int, user_data: UserUpdate) -> bool:
         """Update user by ID"""
         # First check if user exists
         existing_user = self.get_by_id(user_id)
         if not existing_user:
-            return None
+            return False
 
         with get_db_connection() as connection:
             try:
@@ -69,9 +62,7 @@ class UserRepository:
                 update_query = "UPDATE users SET name = %s WHERE id = %s"
                 cursor.execute(update_query, (user_data.name, user_id))
                 connection.commit()
-                
-                # Return updated user
-                return self.get_by_id(user_id)
+                return True
             except Exception as e:
                 logger.exception(e)
                 raise Exception(f"Database error: {str(e)}")
