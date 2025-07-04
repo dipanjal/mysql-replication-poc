@@ -2,118 +2,136 @@ version: '3'
 
 services:
 
-  mysql-master:
-    image: mysql:5.7
-    container_name: proxysql-mysql-replication-master
-    environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: sbtest
-    volumes:
-      - ./master/my.cnf:/etc/mysql/my.cnf
-      # - ./master/data:/var/lib/mysql
-      - ./master/init.sql:/docker-entrypoint-initdb.d/init.sql
-    ports:
-      - 3306:3306
-    networks:
-      - mysql_cluster_net
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-u", "root", "-ppassword"]
-      timeout: 20s
-      retries: 10
+  # mysql-master:
+  #   image: mysql:5.7
+  #   container_name: proxysql-mysql-replication-master
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: password
+  #     MYSQL_DATABASE: sbtest
+  #   volumes:
+  #     - ./master/my.cnf:/etc/mysql/my.cnf
+  #     # - ./master/data:/var/lib/mysql
+  #     - ./master/init.sql:/docker-entrypoint-initdb.d/init.sql
+  #   ports:
+  #     - 3306:3306
+  #   networks:
+  #     - mysql_cluster_net
+  #   healthcheck:
+  #     test: ["CMD", "mysqladmin", "ping", "-u", "root", "-ppassword"]
+  #     timeout: 20s
+  #     retries: 10
 
-  mysql-slave1:
-    image: mysql:5.7
-    container_name: proxysql-mysql-replication-slave1
-    environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: sbtest
-    volumes: #
-      - ./slave/my-slave1.cnf:/etc/mysql/my.cnf
-      # - ./slave/data/slave1:/var/lib/mysql
-      - ./slave/init.sql:/docker-entrypoint-initdb.d/init.sql
-    ports:
-      - 3307:3306
-    depends_on:
-      - mysql-master
-    networks:
-      - mysql_cluster_net
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-u", "root", "-ppassword"]
-      timeout: 20s
-      retries: 10
+  # mysql-slave1:
+  #   image: mysql:5.7
+  #   container_name: proxysql-mysql-replication-slave1
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: password
+  #     MYSQL_DATABASE: sbtest
+  #   volumes: #
+  #     - ./slave/my-slave1.cnf:/etc/mysql/my.cnf
+  #     # - ./slave/data/slave1:/var/lib/mysql
+  #     - ./slave/init.sql:/docker-entrypoint-initdb.d/init.sql
+  #   ports:
+  #     - 3307:3306
+  #   depends_on:
+  #     - mysql-master
+  #   networks:
+  #     - mysql_cluster_net
+  #   healthcheck:
+  #     test: ["CMD", "mysqladmin", "ping", "-u", "root", "-ppassword"]
+  #     timeout: 20s
+  #     retries: 10
 
-  mysql-slave2:
-    image: mysql:5.7
-    container_name: proxysql-mysql-replication-slave2
-    environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: sbtest
-    volumes:
-      - ./slave/my-slave2.cnf:/etc/mysql/my.cnf
-      # - ./slave/data/slave2:/var/lib/mysql
-      - ./slave/init.sql:/docker-entrypoint-initdb.d/init.sql
-    ports:
-      - 3308:3306
-    depends_on:
-      - mysql-master
-    networks:
-      - mysql_cluster_net
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-u", "root", "-ppassword"]
-      timeout: 20s
-      retries: 10
+  # mysql-slave2:
+  #   image: mysql:5.7
+  #   container_name: proxysql-mysql-replication-slave2
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: password
+  #     MYSQL_DATABASE: sbtest
+  #   volumes:
+  #     - ./slave/my-slave2.cnf:/etc/mysql/my.cnf
+  #     # - ./slave/data/slave2:/var/lib/mysql
+  #     - ./slave/init.sql:/docker-entrypoint-initdb.d/init.sql
+  #   ports:
+  #     - 3308:3306
+  #   depends_on:
+  #     - mysql-master
+  #   networks:
+  #     - mysql_cluster_net
+  #   healthcheck:
+  #     test: ["CMD", "mysqladmin", "ping", "-u", "root", "-ppassword"]
+  #     timeout: 20s
+  #     retries: 10
 
-  proxysql:
-    image: proxysql/proxysql:2.0.12
-    container_name: proxysql-mysql-replication-proxysql
-    ports:
-      - 6032:6032
-      - 6033:6033
-    volumes:
-      - ./proxysql/proxysql.cnf:/etc/proxysql.cnf
-      - ./proxysql/data:/var/lib/proxysql
-    networks:
-      - mysql_cluster_net
-    depends_on: # the proxy will start after all the mysql instance has started
-      - mysql-master
-      - mysql-slave1
-      - mysql-slave2
-    healthcheck:
-      # test: ["CMD", "proxysql_admin", "-u", "admin", "-padmin", "-h", "127.0.0.1", "-P", "6032", "--execute", "SELECT 1"]
-      # mysql -h 0.0.0.0 -P 6032 -u admin2 -p -e 'select * from mysql_servers'
-      test: ["CMD", "proxysql_admin", "-u", "admin2", "-ppass2", "-h", "127.0.0.1", "-P", "6032", "--execute", "SELECT 1"]
-      timeout: 20s
-      retries: 5
+  # proxysql:
+  #   image: proxysql/proxysql:2.0.12
+  #   container_name: proxysql-mysql-replication-proxysql
+  #   ports:
+  #     - 6032:6032
+  #     - 6033:6033
+  #   volumes:
+  #     - ./proxysql/proxysql.cnf:/etc/proxysql.cnf
+  #     # - ./proxysql/data:/var/lib/proxysql
+  #   networks:
+  #     - mysql_cluster_net
+  #   depends_on: # the proxy will start after all the mysql instance has started
+  #     - mysql-master
+  #     - mysql-slave1
+  #     - mysql-slave2
+    # healthcheck:
+    #   # test: ["CMD", "proxysql_admin", "-u", "admin", "-padmin", "-h", "127.0.0.1", "-P", "6032", "--execute", "SELECT 1"]
+    #   # mysql -h 0.0.0.0 -P 6032 -u admin2 -p -e 'select * from mysql_servers'
+    #   test: ["CMD", "proxysql_admin", "-u", "admin2", "-ppass2", "-h", "127.0.0.1", "-P", "6032", "--execute", "SELECT 1"]
+    #   timeout: 20s
+    #   retries: 5
   
-  proxysql-spring-boot-test-app:
-    build:
-      context: ./sbtest-app
-    image: dipanjalmaitra/proxysql-spring-boot-test-app:latest
-    ports:
-      - 8001:8080
-    restart: on-failure
-    networks:
-      - mysql_cluster_net
-    depends_on:
-      - proxysql
-    environment:
-      DB_PASSWORD: password
-      DB_URL: jdbc:mysql://proxysql:6033/sbtest?useSSL=false
-      ACTIVE_PROFILE: default
+  # proxysql-spring-boot-test-app:
+  #   build:
+  #     context: ./sbtest-app
+  #   image: dipanjalmaitra/proxysql-spring-boot-test-app:latest
+  #   ports:
+  #     - 8001:8080
+  #   restart: on-failure
+  #   networks:
+  #     - mysql_cluster_net
+  #   depends_on:
+  #     - proxysql
+  #   environment:
+  #     DB_PASSWORD: password
+  #     DB_URL: jdbc:mysql://proxysql:6033/sbtest?useSSL=false
+  #     ACTIVE_PROFILE: default
   
-  proxysql-fastapi-test-app:
+  proxysql-fastapi-raw:
     build:
-      context: ./fastapi-app
-    image: dipanjalmaitra/proxysql-fastapi-test-app:latest
+      context: ./fastapi-raw
+    # image: dipanjalmaitra/proxysql-fastapi-test-app:latest
     ports:
       - 8000:8000
     restart: on-failure
     networks:
       - mysql_cluster_net
-    depends_on:
-      - proxysql
+    # depends_on:
+    #   - proxysql
     environment:
-      DB_HOST: proxysql
+      DB_HOST: 103.174.50.21
+      DB_PORT: 6033
+      DB_NAME: sbtest
+      DB_USER: root
+      DB_PASSWORD: password
+
+  proxysql-fastapi:
+    build:
+      context: ./fastapi-app
+    # image: dipanjalmaitra/proxysql-fastapi-test-app:latest
+    ports:
+      - 8001:8000
+    restart: on-failure
+    networks:
+      - mysql_cluster_net
+    # depends_on:
+    #   - proxysql
+    environment:
+      DB_HOST: 103.174.50.21
       DB_PORT: 6033
       DB_NAME: sbtest
       DB_USER: root
