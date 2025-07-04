@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from app.models.user import User
 from app.schemas.user import UserCreate, UserUpdate
 from typing import List, Optional, Type
-
+import time
 
 class UserRepository:
     """Repository for user database operations"""
@@ -15,6 +15,7 @@ class UserRepository:
         user = User(name=user_data.name)
         self.db.add(user)
         self.db.commit()
+        time.sleep(2)
         self.db.refresh(user)
         return user
     
