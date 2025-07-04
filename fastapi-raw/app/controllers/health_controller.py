@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException
 from starlette import status
 
 from app import APP_NAME
-from app.config.database import check_db_connection
+from app.config.database import check_db_connection, DB_CONFIG
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +28,7 @@ async def health_check():
     try:
         check_db_connection()
         status_payload["database"] = {
+            "host": DB_CONFIG["host"],
             "status": "healthy",
             "message": "✅ Successfully connected to the Database!",
             "type": "MySQL",
@@ -36,6 +37,7 @@ async def health_check():
     except Exception as e:
         logger.exception(e)
         status_payload["database"] = {
+            "host": DB_CONFIG["host"],
             "status": "unhealthy",
             "message": "❌ Unable to establish connection with the Database",
             "error": str(e)
