@@ -20,5 +20,4 @@ create table users
 		primary key (id)
 );
 
-INSERT INTO users VALUES (1, 'dipanjal'), (2, 'shohan');
-
+INSERT INTO users (name) VALUES ('Dipanjal'), ('Raihan'), ('Rakibul');
