@@ -32,11 +32,10 @@ class UserService:
     
     def update_user(self, user_id: int, user_data: UserUpdate) -> Optional[UserResponse]:
         """Update user by ID"""
-        updated = self.repository.update(user_id, user_data)
-        if updated:
-            return UserResponse(**user_data.model_dump(), id=user_id)
-        return None
+        self.repository.update(user_id, user_data)
+        return UserResponse(**user_data.model_dump(), id=user_id)
     
-    def delete_user(self, user_id: int) -> bool:
+    def delete_user(self, user_id: int) -> dict:
         """Delete user by ID"""
-        return self.repository.delete(user_id) 
+        self.repository.delete(user_id)
+        return {"message": "User deleted successfully"}
