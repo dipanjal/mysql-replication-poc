@@ -94,7 +94,7 @@ services:
     depends_on:
       - proxysql
     environment:
-      DB_HOST: 103.174.50.21
+      DB_HOST: proxysql
       DB_PORT: 6033
       DB_NAME: sbtest
       DB_USER: root
@@ -111,7 +111,7 @@ services:
     depends_on:
       - proxysql
     environment:
-      DB_HOST: 103.174.50.21
+      DB_HOST: proxysql
       DB_PORT: 6033
       DB_NAME: sbtest
       DB_USER: root
