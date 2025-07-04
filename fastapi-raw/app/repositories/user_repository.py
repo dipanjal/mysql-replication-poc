@@ -1,9 +1,8 @@
 import logging
 from typing import List, Optional, Dict, Any
-from fastapi import HTTPException
 from app.config.database import get_db_connection
 from app.schemas.user import UserCreate, UserUpdate
-from helper import Parser
+from app.helper import Parser
 
 logger = logging.getLogger(__name__)
 
