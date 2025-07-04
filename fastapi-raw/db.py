@@ -4,6 +4,8 @@ from contextlib import contextmanager
 
 import pymysql
 
+from helper import Parser
+
 logger = logging.getLogger(__name__)
 
 # Database configuration from environment variables
@@ -61,10 +63,14 @@ def get_all_users_db():
     """Get all users from database"""
     with get_db_connection() as connection:
         try:
-            cursor = connection.cursor(dictionary=True)
+            cursor = connection.cursor()
             select_query = "SELECT id, name FROM users ORDER BY id"
             cursor.execute(select_query)
-            users = cursor.fetchall()
+            # users = cursor.fetchall()
+            users: list[dict] = Parser.to_dicts(
+                rows=cursor.fetchall(),
+                field_sequence=["id", "name"]
+            )
             return users
         except Exception as e:
             logger.exception(e)
@@ -74,11 +80,13 @@ def get_user_by_id_db(user_id):
     """Get a specific user by ID from database"""
     with get_db_connection() as connection:
         try:
-            cursor = connection.cursor(dictionary=True)
+            cursor = connection.cursor()
             select_query = "SELECT id, name FROM users WHERE id = %s"
             cursor.execute(select_query, (user_id,))
-            user = cursor.fetchone()
-            return user
+            return Parser.to_dict(
+                row=cursor.fetchone(),
+                field_sequence=["id", "name"]
+            )
         except Exception as e:
             logger.exception(e)
             raise Exception(f"Database error: {str(e)}")
