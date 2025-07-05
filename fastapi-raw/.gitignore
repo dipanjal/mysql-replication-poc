@@ -5,3 +5,4 @@ __pycache__
 venv
 .venv
 .pytest_cache
+env/local.env
