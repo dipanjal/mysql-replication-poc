@@ -47,26 +47,21 @@ mysql_servers =
 mysql_query_rules =
 (
     {
-        rule_id=100
+        rule_id=1
         active=1
-        match_pattern="^SELECT .* FOR UPDATE"
-        destination_hostgroup=10
-        apply=1
-    },
-    {
-        rule_id=200
-        active=1
-        match_pattern="^SELECT .*"
+        match_pattern="^SELECT.*"
         destination_hostgroup=20
         apply=1
+        comment="Route SELECT queries to replica servers"
     },
     {
-        rule_id=300
+        rule_id=2
         active=1
-        match_pattern=".*"
+        match_pattern="^(?!SELECT).*"
         destination_hostgroup=10
         apply=1
-    }
+        comment="Route DML queries to master server"
+    },
 )
 
 mysql_users =
