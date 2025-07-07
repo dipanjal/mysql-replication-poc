@@ -66,5 +66,5 @@ mysql_query_rules =
 
 mysql_users =
 (
-    { username = "root" , password = "password" , default_hostgroup = 20 , active = 1 }
+    { username = "root" , password = "password" , default_hostgroup = 10 , active = 1 }
 )
