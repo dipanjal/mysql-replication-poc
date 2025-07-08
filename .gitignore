@@ -2,8 +2,5 @@ master/data
 slave/data
 proxysql/data
 
-### VS Code ###
-.vscode/
-
 ### Mac-OS native
 .DS_Store
